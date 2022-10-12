@@ -21,10 +21,10 @@ CREATE TABLE store(
     store_name TEXT NOT NULL,
     info TEXT NOT NULL,
     store_type INT NOT NULL,
-    open_time DATE NOT NULL,
-    close_time DATE NOT NULL,
-    latitude DECIMAL(25,20) NOT NULL,
-    longitude DECIMAL(25,20) NOT NULL,
+    open_time TIME NOT NULL,
+    close_time TIME NOT NULL,
+    latitude DECIMAL(25,20),
+    longitude DECIMAL(25,20),
     FOREIGN KEY (`m_id`) REFERENCES `market` (`id`)
 );
 
@@ -62,7 +62,7 @@ CREATE TABLE users_merchant(
 
 CREATE TABLE favorites_store(
     uc_id INT NOT NULL,
-    s_id INT NOT NULL
+    s_id INT NOT NULL,
     FOREIGN KEY (`uc_id`) REFERENCES `users_customer` (`id`),
     FOREIGN KEY (`s_id`) REFERENCES `store` (`id`)
 );
@@ -70,7 +70,7 @@ CREATE TABLE favorites_store(
 CREATE TABLE favorites_product(
     uc_id INT NOT NULL,
     p_id INT NOT NULL,
-    FOREIGN KEY (`id`) REFERENCES `users_customer` (`id`),
+    FOREIGN KEY (`uc_id`) REFERENCES `users_customer` (`id`),
     FOREIGN KEY (`p_id`) REFERENCES `product` (`id`)
 );
 
@@ -87,7 +87,7 @@ CREATE TABLE reservation(
     um_id INT NOT NULL,
     p_id INT NOT NULL,
     s_id INT NOT NULL,
-    reservation_time DATE NOT NULL,
+    reservation_time TIME NOT NULL,
     price INT NOT NULL,
     count INT NOT NULL,
     approval INT NOT NULL,
