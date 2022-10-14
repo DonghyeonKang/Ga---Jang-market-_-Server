@@ -42,6 +42,15 @@ CREATE TABLE product(
     FOREIGN KEY (`s_id`) REFERENCES `store` (`id`)
 );
 
+alter table product drop column price;
+
+CREATE TABLE product_selling_option(
+    p_id INT NOT NULL,
+    price INT NOT NULL,
+    selling_option TEXT,
+    FOREIGN KEY (`p_id`) REFERENCES `product` (`id`)
+);
+
 CREATE TABLE product_img(
     p_id INT NOT NULL,
     img_path TEXT NOT NULL,
