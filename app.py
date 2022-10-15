@@ -1,5 +1,9 @@
 from flask import Flask # Flask start 
 import src.auth.auth_service as auth_service
+from functools import wraps
+from flask import request
+from flask import jsonify
+import datetime, json
 
 app = Flask(__name__)
 
@@ -158,18 +162,25 @@ def logoutMerchant():
     return result
 
 ########################## market #################################################
+import src.market.market_service as market_service
 # market
 @app.route('/market', methods=['GET'])
-@token_required
 def getMarket():
-    return "1"
+    marketService = market_service.MarketService()
+    marketName = request.args.get('market_name')
+    result = marketService.getMarket(marketName)
+    return {"result" : result}
 
 ########################## store #################################################
+import src.store.store_service as store_service
 # 매장 리스트
 @app.route('/store', methods=['GET'])
-@token_required
 def getStore():
-    return "1"
+    storeService = store_service.StoreService()
+    marketName = request.args.get('market_name')
+    result = storeService.getStore(marketName)
+    json_string = json.dumps(result, default=str, ensure_ascii=False)
+    return json.loads(json_string)
 
 # 상시 매장 등록
 @app.route('/store/permanent', methods=['POST'])
@@ -208,10 +219,14 @@ def deleteOneDayStore():
     return "1"
 
 ########################## product #################################################
+import src.product.product_service as product_service
 # 상품 리스트
 @app.route('/product', methods=['GET'])
 def getProduct():
-    return "1"
+    productService = product_service.ProductService()
+    storeName = request.args.get('store_name')
+    result = productService.getProduct(storeName)
+    return {"result" : result}
 
 # 상품 등록
 @app.route('/product', methods=['POST'])
