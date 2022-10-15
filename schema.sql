@@ -60,13 +60,13 @@ CREATE TABLE product_img(
 CREATE TABLE users_customer(
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id TEXT NOT NULL,
-    user_name TEXT NOT NULL
+    user_pw TEXT NOT NULL
 );
 
 CREATE TABLE users_merchant(
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id TEXT NOT NULL,
-    user_name TEXT NOT NULL
+    user_pw TEXT NOT NULL
 );
 
 CREATE TABLE favorites_store(
@@ -108,5 +108,5 @@ CREATE TABLE reservation(
 
 CREATE TABLE token(
     user_id TEXT NOT NULL,
-    token TEXT NOT NULL
+    refresh_token TEXT NOT NULL
 );

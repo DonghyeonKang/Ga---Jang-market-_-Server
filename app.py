@@ -4,9 +4,29 @@ from functools import wraps
 from flask import request
 from flask import jsonify
 import datetime, json
+import jwt
+from jwt import ExpiredSignatureError
+from flask_jwt_extended import *
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_refresh_token
+from flask_jwt_extended import decode_token
+from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
+app.secret_key = 'asd1inldap123jwaw'        # 세션을 암호화하기 위해 비밀키가 서명된 쿠키 사용
+app.config.update(
+			DEBUG = True,
+			JWT_SECRET_KEY = "adswoern!@#rwlenf@#$13rweT#^DSfsrtwer"
+		)
+jwt = JWTManager(app)
 
+if not app.debug: # 디버그 모드가 아니면
+    import logging  # 로깅을 하기위한 모듈
+    from logging.handlers import RotatingFileHandler
+    file_handler = RotatingFileHandler( # 2000바이트가 넘어가면 로테이팅 백업 진행. 최대 파일 10개
+        '../log/arambyeol_error.log', maxBytes=2000, backupCount=10)
+    file_handler.setLevel(logging.WARNING) # WARNING 수준의 레벨들을 로깅
+    app.logger.addHandler(file_handler)
 ########################## member #################################################
 # 토큰 유효성 검사
 def token_required(f):
@@ -47,7 +67,7 @@ def renewToken():
     return result
 
 #---------------- customer -----------------------
-# 앱 회원가입
+# 회원가입
 @app.route('/member/customer', methods=['POST'])
 def registerCustomer():
     authService = auth_service.AuthService()
@@ -55,11 +75,10 @@ def registerCustomer():
     inputData = request.get_json()
     user_id = inputData['user_id']
     user_pw = inputData['user_pw']
-    nickname = inputData['nickname']
-    result = authService.addUser(user_id, user_pw, nickname)
+    result = authService.addCUser(user_id, user_pw)
     return result
 
-# 앱 비밀번호 변경
+# 비밀번호 변경
 @app.route('/member/customer/password', methods=['POST'])
 @token_required
 def changePasswordCustomer():
@@ -68,10 +87,10 @@ def changePasswordCustomer():
     inputData = request.get_json()
     user_id = inputData['user_id']
     user_pw = inputData['user_pw']
-    result = authService.changePassword(user_id, user_pw)
+    result = authService.changeCPassword(user_id, user_pw)
     return result
 
-# 앱 로그인
+# 로그인
 @app.route('/login/customer', methods=['POST'])
 def loginCustomer():
     authService = auth_service.AuthService()
@@ -80,10 +99,10 @@ def loginCustomer():
     user_id = inputData['user_id']
     user_pw = inputData['user_pw']
 
-    resData = authService.appLogin(user_id, user_pw)
+    resData = authService.CLogin(user_id, user_pw)
     return resData
 
-# 앱 로그아웃
+# 로그아웃
 @app.route('/logout/customer', methods=['POST'])
 @token_required
 def logoutCustomer():
@@ -91,8 +110,7 @@ def logoutCustomer():
     # 클라이언트로부터 요청된 값
     inputData = request.get_json()
     user_id = inputData['user_id']
-
-    result = authService.appLogout(user_id)
+    result = authService.CLogout(user_id)
     return result
 
 # 상품 좋아요 리스트
@@ -113,7 +131,7 @@ def addFavorites():
 def deleteFavorites():
     return "1"
 #---------------- merchant -----------------------
-# 앱 회원가입
+# 회원가입
 @app.route('/member/merchant', methods=['POST'])
 def registerMerchant():
     authService = auth_service.AuthService()
@@ -121,11 +139,10 @@ def registerMerchant():
     inputData = request.get_json()
     user_id = inputData['user_id']
     user_pw = inputData['user_pw']
-    nickname = inputData['nickname']
-    result = authService.addUser(user_id, user_pw, nickname)
+    result = authService.addUser(user_id, user_pw)
     return result
 
-# 앱 비밀번호 변경
+# 비밀번호 변경
 @app.route('/member/merchant/password', methods=['POST'])
 @token_required
 def changePasswordMerchant():
@@ -137,7 +154,7 @@ def changePasswordMerchant():
     result = authService.changePassword(user_id, user_pw)
     return result
 
-# 앱 로그인
+# 로그인
 @app.route('/login/merchant', methods=['POST'])
 def loginMerchant():
     authService = auth_service.AuthService()
@@ -149,7 +166,7 @@ def loginMerchant():
     resData = authService.appLogin(user_id, user_pw)
     return resData
 
-# 앱 로그아웃
+# 로그아웃
 @app.route('/logout/merchant', methods=['POST'])
 @token_required
 def logoutMerchant():

@@ -16,6 +16,7 @@ class AuthRepository:
     def closeConnection(self):
         self.connection.close()
 
+
     def insertRefreshToken(self, user_id, refreshToken):
         self.getConnection()
         try:
@@ -60,13 +61,14 @@ class AuthRepository:
         finally:
             self.closeConnection()
     
-    def checkUserId(self, user_id):
+    #--------- /auth/member/customer --------------------------------------
+    def checkCUserId(self, user_id):
         self.getConnection()
         try:
             cursor = self.connection.cursor()
-            cursor.execute("SELECT * FROM users WHERE user_id = %s", user_id)
+            cursor.execute("SELECT * FROM users_customer WHERE user_id = %s", user_id)
             rows = cursor.fetchall()
-
+            
             if(len(rows) == 0): # 가져온 데이터가 없다면 false 있다면 true
                 return "Available"
             else:
@@ -78,11 +80,11 @@ class AuthRepository:
         finally:
             self.closeConnection()
 
-    def checkUserPw(self, user_id):
+    def checkCUserPw(self, user_id):
         self.getConnection()
         try:
             cursor = self.connection.cursor()
-            cursor.execute("SELECT * FROM users WHERE user_id = %s", user_id)
+            cursor.execute("SELECT * FROM users_customer WHERE user_id = %s", user_id)
             row = cursor.fetchone()
             return row
         except Exception as e:
@@ -92,7 +94,7 @@ class AuthRepository:
         finally:
             self.closeConnection()
 
-    def updateUserPw(self, user_id, user_pw):
+    def updateCUserPw(self, user_id, user_pw):
         self.getConnection()
         try:
             cursor = self.connection.cursor()
@@ -107,61 +109,13 @@ class AuthRepository:
         finally:
             self.closeConnection()
 
-    def insertUser(self, user_id, user_pw, nickname):
+    def insertCUser(self, user_id, user_pw):
         self.getConnection()
 
         try:
             cursor = self.connection.cursor() # control structure of database SQL 문장을 DB 서버에 전송하기 위한 객체
-            sql = "INSERT INTO users(user_id, user_pw, nickname) VALUES ('%s', '%s', '%s')" % (user_id, user_pw, nickname)  # 쿼리문 작성
+            sql = "INSERT INTO users_customer(user_id, user_pw) VALUES ('%s', '%s')" % (user_id, user_pw)  # 쿼리문 작성
             cursor.execute(sql) # 쿼리 실행 
-            self.connection.commit() # 쿼리 적용
-            return "success"
-        except Exception as e:
-            print(e)
-            return ""
-        finally:
-            self.closeConnection()
-
-    def checkNickname(self, nickname):
-        self.getConnection()
-
-        try:
-            cursor = self.connection.cursor() # control structure of database SQL 문장을 DB 서버에 전송하기 위한 객체
-            arr = [nickname]
-            cursor.execute("SELECT user_id FROM users WHERE nickname=%s", arr) # 쿼리 실행 
-            rows = cursor.fetchall()
-            if len(rows) == 0:
-                return "Available"
-            else:
-                return "Already exists"
-        except Exception as e:
-            print(e)
-            return ""
-        finally:
-            self.closeConnection()
-
-    def getNickname(self, user_id):
-        self.getConnection()
-
-        try:
-            cursor = self.connection.cursor() # control structure of database SQL 문장을 DB 서버에 전송하기 위한 객체
-            arr = [user_id]
-            cursor.execute("SELECT nickname FROM users WHERE user_id=%s", arr) # 쿼리 실행 
-            rows = cursor.fetchall()
-            return rows[0]['nickname']
-        except Exception as e:
-            print(e)
-            return ""
-        finally:
-            self.closeConnection()
-
-    def updateNickname(self, userId, nickname):
-        self.getConnection()
-
-        try:
-            cursor = self.connection.cursor() # control structure of database SQL 문장을 DB 서버에 전송하기 위한 객체
-            arr = [nickname, userId]
-            cursor.execute("UPDATE users SET nickname=%s WHERE user_id=%s", arr) # 쿼리 실행 
             self.connection.commit() # 쿼리 적용
             return "success"
         except Exception as e:
@@ -201,3 +155,5 @@ class AuthRepository:
             return ""
         finally:
             self.closeConnection()
+
+        #--------- /auth/member/merchant --------------------------------------

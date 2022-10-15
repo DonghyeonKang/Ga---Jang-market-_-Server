@@ -19,9 +19,6 @@ class AuthService:
         pass
 
     #--------- /auth
-    def selectSession(self): # 세션이 데이터베이스에 존재하는 지 확인
-        pass
-
     def createAccessToken(self, user_id): # 로그인 시 토큰 생성, access token 재생성. 
         token = create_access_token(identity = user_id, expires_delta = timedelta(minutes=1440))
         return token
@@ -56,11 +53,72 @@ class AuthService:
             print(e)
             return False
 
-    def createSession(self): # 웹 로그인 시 session 생성
-        pass
+    #--------- /auth/member/customer --------------------------------------
+    def addCUser(self, user_id, user_pw): # 회원 가입
+        authRepository = auth_repository.AuthRepository()
+        # 학교 메일 검증
+        id = user_id.split("@")
+        if len(id) < 2 or id[len(id) - 1] != 'gnu.ac.kr': # split 이 되지 않으면
+                return jsonify({"result":"Id is not gnuEmail"})
+        else:
+            if(authRepository.checkCUserId(user_id) == "Available"):
+                pw = (bcrypt.hashpw(user_pw.encode('UTF-8'), bcrypt.gensalt())).decode('utf-8')  # 해싱 처리
+                result = authRepository.insertCUser(user_id, pw)
+                return jsonify({"result" : result})
+            else:
+                return jsonify({"result" : "Id is already exists"})
 
-    #--------- /auth/member
-    def addUser(self, user_id, user_pw, nickname): # 회원 가입
+    def changeCPassword(self, user_id, user_pw):
+        authRepository = auth_repository.AuthRepository()
+        # 기존 password와 확인
+        decoded_user_pw = (bcrypt.hashpw(user_pw.encode('UTF-8'), bcrypt.gensalt())).decode('utf-8')  # 해싱 처리
+        if self.checkCUserPassword(user_id, user_pw):
+            return jsonify({"result": "Same Password"})            
+        else:
+            # password 변경
+            result = authRepository.updateUserPw(user_id, decoded_user_pw)
+            return jsonify({"result": result})
+
+    def CLogin(self, user_id, user_pw): # 앱 로그인
+        authRepository = auth_repository.AuthRepository()
+        if(authRepository.checkCUserId(user_id) == "Already exists" and self.checkCUserPassword(user_id, user_pw)):
+            return jsonify(result = "success",
+                           access_token = self.createAccessToken(user_id),
+                           refresh_token = self.createRefreshToken(user_id))
+        else:
+            return jsonify(result = "Invalid Params!")
+
+    def CLogout(self, user_id):
+        authRepository = auth_repository.AuthRepository()
+        result = authRepository.deleteRefreshToken(user_id)
+        return jsonify({"result" : result})
+
+    # TODO userid 가 메일이 아닌 경우 예외 처리
+    def getCUid(self, user_id):
+        authRepository = auth_repository.AuthRepository()
+        result = authRepository.getUid(user_id)
+        return result
+
+    # 아이디가 존재하는 지 체크함
+    def checkCUserId(self, userid):
+        authRepository = auth_repository.AuthRepository()
+        result = authRepository.checkUserId(userid)
+        return jsonify({"result": result})
+
+    # 비밀 번호를 비교함
+    def checkCUserPassword(self, input_username, input_password):
+        authRepository = auth_repository.AuthRepository()
+        result = authRepository.checkCUserPw(input_username)
+        input_password = input_password.encode('utf-8') # bcrypt hash transfer
+
+        if result == None: # DB에 계정 정보가 없으면 account == None
+            return False
+        else:
+            check_password = bcrypt.checkpw(input_password, result['user_pw'].encode('utf-8')) # 해싱된 비밀번호 비교
+            return check_password   # 일치하면 true, 틀리면 false
+    
+    #--------- /auth/member/merchant --------------------------------------
+    def addMUser(self, user_id, user_pw): # 회원 가입
         authRepository = auth_repository.AuthRepository()
         # 학교 메일 검증
         id = user_id.split("@")
@@ -69,12 +127,12 @@ class AuthService:
         else:
             if(authRepository.checkUserId(user_id) == "Available"):
                 pw = (bcrypt.hashpw(user_pw.encode('UTF-8'), bcrypt.gensalt())).decode('utf-8')  # 해싱 처리
-                result = authRepository.insertUser(user_id, pw, nickname)
+                result = authRepository.insertUser(user_id, pw)
                 return jsonify({"result" : result})
             else:
                 return jsonify({"result" : "Id is already exists"})
 
-    def changePassword(self, user_id, user_pw):
+    def changeMPassword(self, user_id, user_pw):
         authRepository = auth_repository.AuthRepository()
         # 기존 password와 확인
         decoded_user_pw = (bcrypt.hashpw(user_pw.encode('UTF-8'), bcrypt.gensalt())).decode('utf-8')  # 해싱 처리
@@ -85,62 +143,34 @@ class AuthService:
             result = authRepository.updateUserPw(user_id, decoded_user_pw)
             return jsonify({"result": result})
 
-    def webLogin(self): # 웹 로그인
-        pass
-
-    def appLogin(self, user_id, user_pw): # 앱 로그인
+    def MLogin(self, user_id, user_pw): # 앱 로그인
         authRepository = auth_repository.AuthRepository()
-        nickname = authRepository.getNickname(user_id)
         if(authRepository.checkUserId(user_id) == "Already exists" and self.checkUserPassword(user_id, user_pw)):
             return jsonify(result = "success",
-                           nickname = nickname,
                            access_token = self.createAccessToken(user_id),
                            refresh_token = self.createRefreshToken(user_id))
         else:
             return jsonify(result = "Invalid Params!")
 
-    def appLogout(self, user_id):
+    def MLogout(self, user_id):
         authRepository = auth_repository.AuthRepository()
         result = authRepository.deleteRefreshToken(user_id)
         return jsonify({"result" : result})
 
     # TODO userid 가 메일이 아닌 경우 예외 처리
-    def getUid(self, user_id):
+    def getMUid(self, user_id):
         authRepository = auth_repository.AuthRepository()
         result = authRepository.getUid(user_id)
         return result
 
-    def deleteUser(self, userId, accessToken, refreshToken): # 회원 탈퇴
-        authRepository = auth_repository.AuthRepository()
-        if self.verifyToken(accessToken) is not False and self.verifyToken(refreshToken) is not False:
-            result = authRepository.deleteUser(userId)
-            return jsonify({"result": result})
-        else:
-            return {"message": "EXPIRED_TOKEN"}, 401
-
-    def checkNickname(self, nickname):
-        authRepository = auth_repository.AuthRepository()
-        result = authRepository.checkNickname(nickname)
-        return jsonify({"result" : result})
-
-    def updateNickname(self, user_id, nickname):
-        authRepository = auth_repository.AuthRepository()
-        result = authRepository.checkNickname(nickname)
-
-        if result == 'Available':
-            result = authRepository.updateNickname(user_id, nickname)
-            return jsonify({"result" : result})
-        else:
-            return jsonify({"result" : "Already exists"})
-
     # 아이디가 존재하는 지 체크함
-    def checkUserId(self, userid):
+    def checkMUserId(self, userid):
         authRepository = auth_repository.AuthRepository()
         result = authRepository.checkUserId(userid)
         return jsonify({"result": result})
 
     # 비밀 번호를 비교함
-    def checkUserPassword(self, input_username, input_password):
+    def checkMUserPassword(self, input_username, input_password):
         authRepository = auth_repository.AuthRepository()
         result = authRepository.checkUserPw(input_username)
         input_password = input_password.encode('utf-8') # bcrypt hash transfer
