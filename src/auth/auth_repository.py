@@ -94,21 +94,6 @@ class AuthRepository:
         finally:
             self.closeConnection()
 
-    def updateCUserPw(self, user_id, user_pw):
-        self.getConnection()
-        try:
-            cursor = self.connection.cursor()
-            arr = [user_pw, user_id]
-            cursor.execute("UPDATE users SET user_pw=%s WHERE user_id=%s", arr)
-            self.connection.commit()
-            return "success"
-        except Exception as e:
-            print(e)
-            # TODO 여기 에러 처리 해야함
-            return "DB Update Error"
-        finally:
-            self.closeConnection()
-
     def insertCUser(self, user_id, user_pw):
         self.getConnection()
 
@@ -124,15 +109,46 @@ class AuthRepository:
         finally:
             self.closeConnection()
 
-    def deleteUser(self, userId):
+    #--------- /auth/member/merchant --------------------------------------
+    def checkMUserId(self, user_id):
+        self.getConnection()
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT * FROM users_merchant WHERE user_id = %s", user_id)
+            rows = cursor.fetchall()
+            
+            if(len(rows) == 0): # 가져온 데이터가 없다면 false 있다면 true
+                return "Available"
+            else:
+                return "Already exists"
+        except Exception as e:
+            print(e)
+            # TODO 여기 에러 처리 해야함
+            return ""
+        finally:
+            self.closeConnection()
+
+    def checkMUserPw(self, user_id):
+        self.getConnection()
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT * FROM users_merchant WHERE user_id = %s", user_id)
+            row = cursor.fetchone()
+            return row
+        except Exception as e:
+            print(e)
+            # TODO 여기 에러 처리 해야함
+            return ""
+        finally:
+            self.closeConnection()
+
+    def insertMUser(self, user_id, user_pw):
         self.getConnection()
 
         try:
             cursor = self.connection.cursor() # control structure of database SQL 문장을 DB 서버에 전송하기 위한 객체
-            arr = [userId]
-            cursor.execute("DELETE FROM users WHERE user_id=%s", arr) # 쿼리 실행 
-            self.connection.commit() # 쿼리 적용
-            cursor.execute("DELETE FROM token WHERE user_id=%s", arr) # 쿼리 실행 
+            sql = "INSERT INTO users_merchant(user_id, user_pw) VALUES ('%s', '%s')" % (user_id, user_pw)  # 쿼리문 작성
+            cursor.execute(sql) # 쿼리 실행 
             self.connection.commit() # 쿼리 적용
             return "success"
         except Exception as e:
@@ -140,20 +156,3 @@ class AuthRepository:
             return ""
         finally:
             self.closeConnection()
-    
-    def getUid(self, userId):
-        self.getConnection()
-
-        try:
-            cursor = self.connection.cursor() # control structure of database SQL 문장을 DB 서버에 전송하기 위한 객체
-            arr = [userId]
-            cursor.execute("SELECT id FROM users WHERE user_id=%s", arr) # 쿼리 실행 
-            result = cursor.fetchall()
-            return result[0]['id']
-        except Exception as e:
-            print(e)
-            return ""
-        finally:
-            self.closeConnection()
-
-        #--------- /auth/member/merchant --------------------------------------

@@ -78,18 +78,6 @@ def registerCustomer():
     result = authService.addCUser(user_id, user_pw)
     return result
 
-# 비밀번호 변경
-@app.route('/member/customer/password', methods=['POST'])
-@token_required
-def changePasswordCustomer():
-    authService = auth_service.AuthService()
-    # 클라이언트로부터 요청된 값
-    inputData = request.get_json()
-    user_id = inputData['user_id']
-    user_pw = inputData['user_pw']
-    result = authService.changeCPassword(user_id, user_pw)
-    return result
-
 # 로그인
 @app.route('/login/customer', methods=['POST'])
 def loginCustomer():
@@ -139,19 +127,7 @@ def registerMerchant():
     inputData = request.get_json()
     user_id = inputData['user_id']
     user_pw = inputData['user_pw']
-    result = authService.addUser(user_id, user_pw)
-    return result
-
-# 비밀번호 변경
-@app.route('/member/merchant/password', methods=['POST'])
-@token_required
-def changePasswordMerchant():
-    authService = auth_service.AuthService()
-    # 클라이언트로부터 요청된 값
-    inputData = request.get_json()
-    user_id = inputData['user_id']
-    user_pw = inputData['user_pw']
-    result = authService.changePassword(user_id, user_pw)
+    result = authService.addMUser(user_id, user_pw)
     return result
 
 # 로그인
@@ -163,7 +139,7 @@ def loginMerchant():
     user_id = inputData['user_id']
     user_pw = inputData['user_pw']
 
-    resData = authService.appLogin(user_id, user_pw)
+    resData = authService.MLogin(user_id, user_pw)
     return resData
 
 # 로그아웃
@@ -175,7 +151,7 @@ def logoutMerchant():
     inputData = request.get_json()
     user_id = inputData['user_id']
 
-    result = authService.appLogout(user_id)
+    result = authService.MLogout(user_id)
     return result
 
 ########################## market #################################################

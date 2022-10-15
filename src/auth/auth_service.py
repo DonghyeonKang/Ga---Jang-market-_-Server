@@ -68,17 +68,6 @@ class AuthService:
             else:
                 return jsonify({"result" : "Id is already exists"})
 
-    def changeCPassword(self, user_id, user_pw):
-        authRepository = auth_repository.AuthRepository()
-        # 기존 password와 확인
-        decoded_user_pw = (bcrypt.hashpw(user_pw.encode('UTF-8'), bcrypt.gensalt())).decode('utf-8')  # 해싱 처리
-        if self.checkCUserPassword(user_id, user_pw):
-            return jsonify({"result": "Same Password"})            
-        else:
-            # password 변경
-            result = authRepository.updateUserPw(user_id, decoded_user_pw)
-            return jsonify({"result": result})
-
     def CLogin(self, user_id, user_pw): # 앱 로그인
         authRepository = auth_repository.AuthRepository()
         if(authRepository.checkCUserId(user_id) == "Already exists" and self.checkCUserPassword(user_id, user_pw)):
@@ -92,12 +81,6 @@ class AuthService:
         authRepository = auth_repository.AuthRepository()
         result = authRepository.deleteRefreshToken(user_id)
         return jsonify({"result" : result})
-
-    # TODO userid 가 메일이 아닌 경우 예외 처리
-    def getCUid(self, user_id):
-        authRepository = auth_repository.AuthRepository()
-        result = authRepository.getUid(user_id)
-        return result
 
     # 아이디가 존재하는 지 체크함
     def checkCUserId(self, userid):
@@ -125,27 +108,16 @@ class AuthService:
         if len(id) < 2 or id[len(id) - 1] != 'gnu.ac.kr': # split 이 되지 않으면
                 return jsonify({"result":"Id is not gnuEmail"})
         else:
-            if(authRepository.checkUserId(user_id) == "Available"):
+            if(authRepository.checkMUserId(user_id) == "Available"):
                 pw = (bcrypt.hashpw(user_pw.encode('UTF-8'), bcrypt.gensalt())).decode('utf-8')  # 해싱 처리
-                result = authRepository.insertUser(user_id, pw)
+                result = authRepository.insertMUser(user_id, pw)
                 return jsonify({"result" : result})
             else:
                 return jsonify({"result" : "Id is already exists"})
 
-    def changeMPassword(self, user_id, user_pw):
-        authRepository = auth_repository.AuthRepository()
-        # 기존 password와 확인
-        decoded_user_pw = (bcrypt.hashpw(user_pw.encode('UTF-8'), bcrypt.gensalt())).decode('utf-8')  # 해싱 처리
-        if self.checkUserPassword(user_id, user_pw):
-            return jsonify({"result": "Same Password"})            
-        else:
-            # password 변경
-            result = authRepository.updateUserPw(user_id, decoded_user_pw)
-            return jsonify({"result": result})
-
     def MLogin(self, user_id, user_pw): # 앱 로그인
         authRepository = auth_repository.AuthRepository()
-        if(authRepository.checkUserId(user_id) == "Already exists" and self.checkUserPassword(user_id, user_pw)):
+        if(authRepository.checkMUserId(user_id) == "Already exists" and self.checkMUserPassword(user_id, user_pw)):
             return jsonify(result = "success",
                            access_token = self.createAccessToken(user_id),
                            refresh_token = self.createRefreshToken(user_id))
@@ -157,22 +129,16 @@ class AuthService:
         result = authRepository.deleteRefreshToken(user_id)
         return jsonify({"result" : result})
 
-    # TODO userid 가 메일이 아닌 경우 예외 처리
-    def getMUid(self, user_id):
-        authRepository = auth_repository.AuthRepository()
-        result = authRepository.getUid(user_id)
-        return result
-
     # 아이디가 존재하는 지 체크함
     def checkMUserId(self, userid):
         authRepository = auth_repository.AuthRepository()
-        result = authRepository.checkUserId(userid)
+        result = authRepository.checkMUserId(userid)
         return jsonify({"result": result})
 
     # 비밀 번호를 비교함
     def checkMUserPassword(self, input_username, input_password):
         authRepository = auth_repository.AuthRepository()
-        result = authRepository.checkUserPw(input_username)
+        result = authRepository.checkMUserPw(input_username)
         input_password = input_password.encode('utf-8') # bcrypt hash transfer
 
         if result == None: # DB에 계정 정보가 없으면 account == None
