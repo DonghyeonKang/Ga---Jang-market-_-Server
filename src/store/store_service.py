@@ -10,7 +10,7 @@ class StoreService:
     def getStore(self, marketName):
         result = self.storeRepository.getStoreData(marketName)
         return result
-        
+
     # 매장 이미지 조회
     def getStoreImg(self, marketID):
         result = self.storeRepository.getStoreImage(marketID)
@@ -18,12 +18,15 @@ class StoreService:
 
     # 매장 등록
     def addStore(self, data):
-        result = self.storeRepository.addStore(data)
+        imgArr = [data['image']]
+        print(imgArr)
+        result = self.storeRepository.addStore(data, imgArr)
         return result
 
     # 매장 수정
     def updateStore(self, data):
-        result = self.storeRepository.updateStore(data)
+        imgArr = [data['image']]
+        result = self.storeRepository.updateStore(data, imgArr)
         return result
 
     # 매장 삭제

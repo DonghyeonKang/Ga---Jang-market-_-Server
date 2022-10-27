@@ -167,6 +167,9 @@ def getMarket():
 ########################## store #################################################
 import src.store.store_service as store_service
 storeService = store_service.StoreService()
+import src.images.imageService as image_service
+imageService = image_service.ImageService()
+
 # 매장 리스트
 @app.route('/store', methods=['GET'])
 def getStore():
@@ -179,6 +182,12 @@ def getStore():
 @app.route('/store', methods=['POST'])
 def addStore():
     inputData = request.get_json()
+    # 이미지 저장 및 path
+    strImage = inputData['image']     
+    storeName = inputData['store_name']
+    path = imageService.saveImage(strImage, storeName, "store")
+    inputData['image'] = path
+
     result = storeService.addStore(inputData)
     return {"result" : result}
 
@@ -186,6 +195,12 @@ def addStore():
 @app.route('/store', methods=['PUT'])
 def updateStore():
     inputData = request.get_json()
+    # 이미지 저장 및 path
+    strImage = inputData['image']     
+    storeName = inputData['store_name']
+    path = imageService.saveImage(strImage, storeName, "store")
+    inputData['image'] = path
+
     result = storeService.updateStore(inputData)
     return {"result" : result}
 
