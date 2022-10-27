@@ -20,8 +20,8 @@ class SearchRepository:
         self.getConnection()
         try:
             cursor = self.connection.cursor()
-            arr = [word]
-            cursor.execute("SELECT s_id FROM product WHERE product_name like '%" + "%s" + "%'", arr)
+            sql = "SELECT DISTINCT s_id FROM product WHERE product_name like '%" + word + "%'"
+            cursor.execute(sql)
             rows = cursor.fetchall()
             return rows
         except Exception as e:
