@@ -10,37 +10,23 @@ class StoreService:
     def getStore(self, marketName):
         result = self.storeRepository.getStoreData(marketName)
         return result
+        
     # 매장 이미지 조회
     def getStoreImg(self, marketID):
         result = self.storeRepository.getStoreImage(marketID)
         return result
 
-    # 상시 매장 등록
-    def addPermanentStore(self, data):
-        result = self.storeRepository.addPermanentStore(data)
+    # 매장 등록
+    def addStore(self, data):
+        result = self.storeRepository.addStore(data)
         return result
 
-    # 상시 매장 수정
-    def updatePermanentStore(self, data):
-        result = self.storeRepository.updatePermanentStore(data)
+    # 매장 수정
+    def updateStore(self, data):
+        result = self.storeRepository.updateStore(data)
         return result
 
-    # 상시 매장 삭제
-    def deletePermanentStore(self, storeID):
-        result = self.storeRepository.deletePermanentStore(storeID)
-        return result
-
-    # 일일 매장 등록
-    def addOneDayStore(self, data):
-        result = self.storeRepository.addOneDayStore(data)
-        return result
-
-    # 상시 매장 수정
-    def updateOneDayStore(self, data):
-        result = self.storeRepository.updateOneDayStore(data)
-        return result
-
-    # 일일 매장 삭제
-    def deleteOneDayStore(self, storeID):
-        result = self.storeRepository.deleteOneDayStore(storeID)
+    # 매장 삭제
+    def deleteStore(self, storeId):
+        result = self.storeRepository.deleteStore(storeId)
         return result

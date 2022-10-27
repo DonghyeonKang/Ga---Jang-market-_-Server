@@ -48,13 +48,13 @@ class StoreRepository:
         finally:
             self.closeConnection()
 
-    # 상시 매장 등록
-    def addPermanentStore(self, data):
+    # 매장 등록
+    def addStore(self, data):
         self.getConnection()
         try:
             cursor = self.connection.cursor()
-            arr = data
-            cursor.execute("INSERT INTO store() VALUES()", arr)
+            arr = [data['market_id'], data['store_name'], data['info'], data['store_type'], data['open_time'], data['close_time'], data['latitude'], data['longitude']]
+            cursor.execute("INSERT INTO store(m_id, store_name, info, store_type, open_time, close_time, latitude, longitude) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)", arr)
             self.connection.commit()
             return "success"
         except Exception as e:
@@ -63,43 +63,13 @@ class StoreRepository:
         finally:
             self.closeConnection()
 
-    # 상시 매장 수정
-    def updatePermanentStore(self, data):
+    # 매장 수정
+    def updateStore(self, data):
         self.getConnection()
         try:
             cursor = self.connection.cursor()
-            arr = data
-            cursor.execute("", arr)
-            self.connection.commit()
-            return "success"
-        except Exception as e:
-            print(e)
-            return "DB Update Error"
-        finally:
-            self.closeConnection()
-
-    # 상시 매장 삭제
-    def deletePermanentStore(self, storeID):
-        self.getConnection()
-        try:
-            cursor = self.connection.cursor()
-            arr = [storeID]
-            cursor.execute("", arr)
-            self.connection.commit()
-            return "success"
-        except Exception as e:
-            print(e)
-            return "DB delete Error"
-        finally:
-            self.closeConnection()
-
-    # 일일 매장 등록
-    def addOneDayStore(self, data):
-        self.getConnection()
-        try:
-            cursor = self.connection.cursor()
-            arr = data
-            cursor.execute("INSERT INTO store() VALUES()", arr)
+            arr = [data['store_name'], data['info'], data['store_type'], data['open_time'], data['close_time'], data['latitude'], data['longitude'], data['store_id']]
+            cursor.execute("UPDATE store SET store_name=%s, info=%s, store_type=%s, open_time=%s, close_time=%s, latitude=%s, longitude=%s WHERE id=%s", arr)
             self.connection.commit()
             return "success"
         except Exception as e:
@@ -108,28 +78,13 @@ class StoreRepository:
         finally:
             self.closeConnection()
 
-    # 상시 매장 수정
-    def updateOneDayStore(self, data):
+    # 매장 삭제
+    def deleteStore(self, storeId):
         self.getConnection()
         try:
             cursor = self.connection.cursor()
-            arr = data
-            cursor.execute("", arr)
-            self.connection.commit()
-            return "success"
-        except Exception as e:
-            print(e)
-            return "DB Update Error"
-        finally:
-            self.closeConnection()
-
-    # 일일 매장 삭제
-    def deleteOneDayStore(self, storeID):
-        self.getConnection()
-        try:
-            cursor = self.connection.cursor()
-            arr = [storeID]
-            cursor.execute("", arr)
+            arr = [storeId]
+            cursor.execute("DELETE FROM store WHERE id=%s", arr)
             self.connection.commit()
             return "success"
         except Exception as e:

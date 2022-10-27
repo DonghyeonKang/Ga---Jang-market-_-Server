@@ -175,48 +175,26 @@ def getStore():
     json_string = json.dumps(result, default=str, ensure_ascii=False)
     return json.loads(json_string)
 
-# 상시 매장 등록
-@app.route('/store/permanent', methods=['POST'])
-def addPermanentStore():
-    marketName = request.args.get('market_name')
-    result = storeService.getStore(marketName)
+# 매장 등록
+@app.route('/store', methods=['POST'])
+def addStore():
+    inputData = request.get_json()
+    result = storeService.addStore(inputData)
     return {"result" : result}
 
-# 상시 매장 수정
-@app.route('/store/permanent', methods=['PUT'])
-def updatePermanentStore():
-    marketName = request.args.get('market_name')
-    result = storeService.updatePermanentStore(marketName)
+# 매장 수정
+@app.route('/store', methods=['PUT'])
+def updateStore():
+    inputData = request.get_json()
+    result = storeService.updateStore(inputData)
     return {"result" : result}
 
-# 상시 매장 삭제
-@app.route('/store/permanent', methods=['DELETE'])
-def deletePermanentStore():
-    marketName = request.args.get('market_name')
-    result = storeService.deletePermanentStore(marketName)
+# 매장 삭제
+@app.route('/store', methods=['DELETE'])
+def deleteStore():
+    storeId = request.args.get('store_id')
+    result = storeService.deleteStore(storeId)
     return {"result" : result}
-
-# 일일 매장 등록
-@app.route('/store/oneday', methods=['POST'])
-def addOneDayStore():
-    marketName = request.args.get('market_name')
-    result = storeService.addOneDayStore(marketName)
-    return {"result" : result}
-
-# 상시 매장 수정
-@app.route('/store/oneday', methods=['PUT'])
-def updateOneDayStore():
-    marketName = request.args.get('market_name')
-    result = storeService.updateOneDayStore(marketName)
-    return {"result" : result}
-
-# 일일 매장 삭제
-@app.route('/store/oneday', methods=['DELETE'])
-def deleteOneDayStore():
-    marketName = request.args.get('market_name')
-    result = storeService.deleteOneDayStore(marketName)
-    return {"result" : result}
-
 ########################## product #################################################
 import src.product.product_service as product_service
 productService = product_service.ProductService()
