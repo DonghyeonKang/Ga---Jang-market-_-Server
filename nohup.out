@@ -1,12 +1,69 @@
- * Serving Flask app 'app'
- * Debug mode: on
-[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on all addresses (0.0.0.0)
- * Running on http://127.0.0.1:5000
- * Running on http://192.168.128.3:5000
-[33mPress CTRL+C to quit[0m
+ * Detected change in '/home/gajang/src/market/market_repository.py', reloading
  * Restarting with stat
  * Debugger is active!
  * Debugger PIN: 102-617-177
-203.255.3.172 - - [15/Oct/2022 16:20:34] "POST /logout/merchant HTTP/1.1" 200 -
-203.255.3.172 - - [15/Oct/2022 16:20:52] "GET /market?market_name=고성시장 HTTP/1.1" 200 -
+ * Detected change in '/home/gajang/src/store/store_service.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 102-617-177
+ * Detected change in '/home/gajang/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 102-617-177
+ * Detected change in '/home/gajang/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 102-617-177
+ * Detected change in '/home/gajang/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 102-617-177
+ * Detected change in '/home/gajang/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 102-617-177
+ * Detected change in '/home/gajang/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 102-617-177
+ * Detected change in '/home/gajang/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 102-617-177
+ * Detected change in '/home/gajang/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 102-617-177
+ * Detected change in '/home/gajang/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 102-617-177
+ * Detected change in '/home/gajang/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 102-617-177
+ * Detected change in '/home/gajang/src/store/store_service.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 102-617-177
+ * Detected change in '/home/gajang/src/store/store_service.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 102-617-177
+ * Detected change in '/home/gajang/src/store/store_service.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 102-617-177
+ * Detected change in '/home/gajang/src/store/store_service.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 102-617-177
+ * Detected change in '/home/gajang/src/store/store_service.py', reloading
+ * Restarting with stat
+Traceback (most recent call last):
+  File "/home/gajang/app.py", line 168, in <module>
+    import src.store.store_service as store_service
+  File "/home/gajang/src/store/store_service.py", line 32
+    def updatePermanentStore():
+    ^
+IndentationError: expected an indented block

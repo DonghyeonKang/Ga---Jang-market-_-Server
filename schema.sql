@@ -11,7 +11,7 @@ CREATE TABLE market(
 CREATE TABLE market_img(
     m_id INT NOT NULL,
     img_path TEXT NOT NULL,
-    FOREIGN KEY (`m_id`) REFERENCES `market` (`id`)
+    FOREIGN KEY (`m_id`) REFERENCES `market` (`id`) ON DELETE CASCADE
 );
 
 -- store type 은 0이면 상시, 1이면 일일 매장
@@ -25,36 +25,36 @@ CREATE TABLE store(
     close_time TIME NOT NULL,
     latitude DECIMAL(25,20),
     longitude DECIMAL(25,20),
-    FOREIGN KEY (`m_id`) REFERENCES `market` (`id`)
+    FOREIGN KEY (`m_id`) REFERENCES `market` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE store_img(
     s_id INT NOT NULL,
     img_path TEXT NOT NULL,
-    FOREIGN KEY (`s_id`) REFERENCES `store` (`id`)
+    FOREIGN KEY (`s_id`) REFERENCES `store` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE product(
     id INT PRIMARY KEY AUTO_INCREMENT,
     s_id INT NOT NULL,
     product_name TEXT NOT NULL,
-    price INT NOT NULL,
-    FOREIGN KEY (`s_id`) REFERENCES `store` (`id`)
+    FOREIGN KEY (`s_id`) REFERENCES `store` (`id`) ON DELETE CASCADE
 );
-
-alter table product drop column price;
 
 CREATE TABLE product_selling_option(
     p_id INT NOT NULL,
     price INT NOT NULL,
     selling_option TEXT,
-    FOREIGN KEY (`p_id`) REFERENCES `product` (`id`)
+    FOREIGN KEY (`p_id`) REFERENCES `product` (`id`) ON DELETE CASCADE
+
 );
 
 CREATE TABLE product_img(
     p_id INT NOT NULL,
+    s_id INT NOT NULL,
     img_path TEXT NOT NULL,
-    FOREIGN KEY (`p_id`) REFERENCES `product` (`id`)
+    FOREIGN KEY (`p_id`) REFERENCES `product` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`s_id`) REFERENCES `store` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE users_customer(
@@ -72,22 +72,22 @@ CREATE TABLE users_merchant(
 CREATE TABLE favorites_store(
     uc_id INT NOT NULL,
     s_id INT NOT NULL,
-    FOREIGN KEY (`uc_id`) REFERENCES `users_customer` (`id`),
-    FOREIGN KEY (`s_id`) REFERENCES `store` (`id`)
+    FOREIGN KEY (`uc_id`) REFERENCES `users_customer` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`s_id`) REFERENCES `store` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE favorites_product(
     uc_id INT NOT NULL,
     p_id INT NOT NULL,
-    FOREIGN KEY (`uc_id`) REFERENCES `users_customer` (`id`),
-    FOREIGN KEY (`p_id`) REFERENCES `product` (`id`)
+    FOREIGN KEY (`uc_id`) REFERENCES `users_customer` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`p_id`) REFERENCES `product` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE management(
     um_id INT NOT NULL,
     s_id INT NOT NULL,
-    FOREIGN KEY (`um_id`) REFERENCES `users_merchant` (`id`),
-    FOREIGN KEY (`s_id`) REFERENCES `store` (`id`)
+    FOREIGN KEY (`um_id`) REFERENCES `users_merchant` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`s_id`) REFERENCES `store` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE reservation(
@@ -100,10 +100,10 @@ CREATE TABLE reservation(
     price INT NOT NULL,
     count INT NOT NULL,
     approval INT NOT NULL,
-    FOREIGN KEY (`uc_id`) REFERENCES `users_customer` (`id`),
-    FOREIGN KEY (`um_id`) REFERENCES `users_merchant` (`id`),
-    FOREIGN KEY (`p_id`) REFERENCES `product` (`id`),
-    FOREIGN KEY (`s_id`) REFERENCES `store` (`id`)
+    FOREIGN KEY (`uc_id`) REFERENCES `users_customer` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`um_id`) REFERENCES `users_merchant` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`p_id`) REFERENCES `product` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`s_id`) REFERENCES `store` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE token(

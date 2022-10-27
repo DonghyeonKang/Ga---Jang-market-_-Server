@@ -102,19 +102,19 @@ def logoutCustomer():
     return result
 
 # 상품 좋아요 리스트
-@app.route('/Favorites', methods=['GET'])
+@app.route('/favorites', methods=['GET'])
 @token_required
 def getFavorites():
     return "1"
 
 # 상품 좋아요
-@app.route('/Favorites', methods=['POST'])
+@app.route('/favorites', methods=['POST'])
 @token_required
 def addFavorites():
     return "1"
 
 # 상품 좋아요 취소
-@app.route('/Favorites', methods=['DELETE'])
+@app.route('/favorites', methods=['DELETE'])
 @token_required
 def deleteFavorites():
     return "1"
@@ -166,10 +166,10 @@ def getMarket():
 
 ########################## store #################################################
 import src.store.store_service as store_service
+storeService = store_service.StoreService()
 # 매장 리스트
 @app.route('/store', methods=['GET'])
 def getStore():
-    storeService = store_service.StoreService()
     marketName = request.args.get('market_name')
     result = storeService.getStore(marketName)
     json_string = json.dumps(result, default=str, ensure_ascii=False)
@@ -177,46 +177,52 @@ def getStore():
 
 # 상시 매장 등록
 @app.route('/store/permanent', methods=['POST'])
-@token_required
 def addPermanentStore():
-    return "1"
+    marketName = request.args.get('market_name')
+    result = storeService.getStore(marketName)
+    return {"result" : result}
 
 # 상시 매장 수정
 @app.route('/store/permanent', methods=['PUT'])
-@token_required
 def updatePermanentStore():
-    return "1"
+    marketName = request.args.get('market_name')
+    result = storeService.updatePermanentStore(marketName)
+    return {"result" : result}
 
 # 상시 매장 삭제
 @app.route('/store/permanent', methods=['DELETE'])
-@token_required
 def deletePermanentStore():
-    return "1"
+    marketName = request.args.get('market_name')
+    result = storeService.deletePermanentStore(marketName)
+    return {"result" : result}
 
 # 일일 매장 등록
-@app.route('/store/oneDay', methods=['POST'])
-@token_required
+@app.route('/store/oneday', methods=['POST'])
 def addOneDayStore():
-    return "1"
+    marketName = request.args.get('market_name')
+    result = storeService.addOneDayStore(marketName)
+    return {"result" : result}
 
 # 상시 매장 수정
-@app.route('/store/oneDay', methods=['PUT'])
-@token_required
+@app.route('/store/oneday', methods=['PUT'])
 def updateOneDayStore():
-    return "1"
+    marketName = request.args.get('market_name')
+    result = storeService.updateOneDayStore(marketName)
+    return {"result" : result}
 
 # 일일 매장 삭제
-@app.route('/store/oneDay', methods=['DELETE'])
-@token_required
+@app.route('/store/oneday', methods=['DELETE'])
 def deleteOneDayStore():
-    return "1"
+    marketName = request.args.get('market_name')
+    result = storeService.deleteOneDayStore(marketName)
+    return {"result" : result}
 
 ########################## product #################################################
 import src.product.product_service as product_service
+productService = product_service.ProductService()
 # 상품 리스트
 @app.route('/product', methods=['GET'])
 def getProduct():
-    productService = product_service.ProductService()
     storeName = request.args.get('store_name')
     result = productService.getProduct(storeName)
     return {"result" : result}
@@ -224,73 +230,74 @@ def getProduct():
 # 상품 등록
 @app.route('/product', methods=['POST'])
 def addProduct():
-    return "1"
+    inputData = request.get_json()
+    result = productService.addProduct(inputData)
+    return {"result" : result}
 
 # 상품 수정
 @app.route('/product', methods=['PUT'])
 def updateProduct():
-    return "1"
+    inputData = request.get_json()
+    result = productService.updateProduct(inputData)
+    return {"result" : result}
 
 # 상품 삭제
 @app.route('/product', methods=['DELETE'])
 def deleteProduct():
-    return "1"
-
-########################## notification #################################################
-# 매장 알림 목록
-@app.route('/product', methods=['GET'])
-@token_required
-def getNotification():
-    return "1"
-
-# 매장 알림 등록
-@app.route('/product', methods=['POST'])
-@token_required
-def addNotification():
-    return "1"
-
-# 매장 알림 취소
-@app.route('/product', methods=['DELETE'])
-@token_required
-def deleteNotification():
-    return "1"
+    productId = request.args.get('product_id')
+    storeId = request.args.get('store_id')
+    result = productService.deleteProduct(productId, storeId)
+    return {"result" : result}
 
 ########################## reservation #################################################
+import src.reservation.reservation_service as reservation_service
+reservationService = reservation_service.ReservationService()
 # 예약 리스트
 @app.route('/reservation', methods=['GET'])
-@token_required
 def getReservation():
-    return "1"
+    user_id = request.args.get('user_id')
+    result = reservationService.getReservation(user_id)
+    return {"result" : result}
 
 # 예약하기
 @app.route('/reservation', methods=['POST'])
-@token_required
 def addReservation():
-    return "1"
+    # notification 으로 상인에게 알림을 넘겨줘야함
+    inputData = request.get_json()
+    result = reservationService.addReservation(inputData)
+    return {"reservation_id" : result}
 
 # 취소하기
 @app.route('/reservation', methods=['DELETE'])
-@token_required
 def deleteReservation():
-    return "1"
+    reservation_id = request.args.get('reservation_id')
+    result = reservationService.deleteReservation(reservation_id)
+    return {"result" : result}
 
 # 수락하기
 @app.route('/reservation/accept', methods=['POST'])
-@token_required
 def acceptReservation():
-    return "1"
+    inputData = request.get_json()
+    result = reservationService.acceptReservation(inputData['reservation_id'])
+    return {"result" : result}
 
 # 거절하기
 @app.route('/reservation/reject', methods=['POST'])
-@token_required
 def rejectReservation():
-    return "1"
+    inputData = request.get_json()
+    result = reservationService.rejectReservation(inputData['reservation_id'])
+    return {"result" : result}
 
 ########################## search #################################################
+import src.search.search_service as search_service
+searchService = search_service.SearchService()
+
 # 검색하기
 @app.route('/search', methods=['GET'])
 def search():
-    return "1"
+    word = request.args.get('word')
+    result = searchService.getSearchData(word)
+    return {"result" : result}
 
 
 if __name__ == '__main__':

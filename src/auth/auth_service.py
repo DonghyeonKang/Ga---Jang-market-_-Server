@@ -56,17 +56,12 @@ class AuthService:
     #--------- /auth/member/customer --------------------------------------
     def addCUser(self, user_id, user_pw): # 회원 가입
         authRepository = auth_repository.AuthRepository()
-        # 학교 메일 검증
-        id = user_id.split("@")
-        if len(id) < 2 or id[len(id) - 1] != 'gnu.ac.kr': # split 이 되지 않으면
-                return jsonify({"result":"Id is not gnuEmail"})
+        if(authRepository.checkCUserId(user_id) == "Available"):
+            pw = (bcrypt.hashpw(user_pw.encode('UTF-8'), bcrypt.gensalt())).decode('utf-8')  # 해싱 처리
+            result = authRepository.insertCUser(user_id, pw)
+            return jsonify({"result" : result})
         else:
-            if(authRepository.checkCUserId(user_id) == "Available"):
-                pw = (bcrypt.hashpw(user_pw.encode('UTF-8'), bcrypt.gensalt())).decode('utf-8')  # 해싱 처리
-                result = authRepository.insertCUser(user_id, pw)
-                return jsonify({"result" : result})
-            else:
-                return jsonify({"result" : "Id is already exists"})
+            return jsonify({"result" : "Id is already exists"})
 
     def CLogin(self, user_id, user_pw): # 앱 로그인
         authRepository = auth_repository.AuthRepository()
@@ -103,17 +98,12 @@ class AuthService:
     #--------- /auth/member/merchant --------------------------------------
     def addMUser(self, user_id, user_pw): # 회원 가입
         authRepository = auth_repository.AuthRepository()
-        # 학교 메일 검증
-        id = user_id.split("@")
-        if len(id) < 2 or id[len(id) - 1] != 'gnu.ac.kr': # split 이 되지 않으면
-                return jsonify({"result":"Id is not gnuEmail"})
+        if(authRepository.checkMUserId(user_id) == "Available"):
+            pw = (bcrypt.hashpw(user_pw.encode('UTF-8'), bcrypt.gensalt())).decode('utf-8')  # 해싱 처리
+            result = authRepository.insertMUser(user_id, pw)
+            return jsonify({"result" : result})
         else:
-            if(authRepository.checkMUserId(user_id) == "Available"):
-                pw = (bcrypt.hashpw(user_pw.encode('UTF-8'), bcrypt.gensalt())).decode('utf-8')  # 해싱 처리
-                result = authRepository.insertMUser(user_id, pw)
-                return jsonify({"result" : result})
-            else:
-                return jsonify({"result" : "Id is already exists"})
+            return jsonify({"result" : "Id is already exists"})
 
     def MLogin(self, user_id, user_pw): # 앱 로그인
         authRepository = auth_repository.AuthRepository()
