@@ -34,12 +34,12 @@ class StoreRepository:
         finally:
             self.closeConnection()
     
-    def getStoreImage(self, marketID):
+    def getStoreImage(self, storeId):
         self.getConnection()
         try:
             cursor = self.connection.cursor()
-            arr = [marketID]
-            cursor.execute("SELECT * FROM store_img WHERE s_id IN (SELECT id FROM store WHERE m_id=%s)", arr)
+            arr = [storeId]
+            cursor.execute("SELECT img_path FROM store_img WHERE s_id=%s", arr)
             rows = cursor.fetchall()
             return rows
         except Exception as e:
@@ -56,7 +56,7 @@ class StoreRepository:
             arr = [data['market_id'], data['store_name'], data['info'], data['store_type'], data['open_time'], data['close_time'], data['latitude'], data['longitude']]
             cursor.execute("INSERT INTO store(m_id, store_name, info, store_type, open_time, close_time, latitude, longitude) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)", arr)
             self.connection.commit()
-
+            # 등록한 매장의 store_id를 가져옵니다. 
             arr = [data['market_id'], data['store_name']]
             print(arr)
             cursor.execute("SELECT id FROM store WHERE m_id=%s AND store_name=%s", arr)

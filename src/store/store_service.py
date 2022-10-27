@@ -12,8 +12,8 @@ class StoreService:
         return result
 
     # 매장 이미지 조회
-    def getStoreImg(self, marketID):
-        result = self.storeRepository.getStoreImage(marketID)
+    def getStoreImg(self, storeId):
+        result = self.storeRepository.getStoreImage(storeId)
         return result
 
     # 매장 등록

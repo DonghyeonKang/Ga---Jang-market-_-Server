@@ -195,6 +195,10 @@ def addStore():
 @app.route('/store', methods=['PUT'])
 def updateStore():
     inputData = request.get_json()
+    # 기존 이미지 삭제
+    imgPath = storeService.getStoreImg(inputData['store_id'])
+    imageService.deleteImage(imgPath)
+
     # 이미지 저장 및 path
     strImage = inputData['image']     
     storeName = inputData['store_name']
@@ -208,6 +212,12 @@ def updateStore():
 @app.route('/store', methods=['DELETE'])
 def deleteStore():
     storeId = request.args.get('store_id')
+
+    # 이미지 삭제
+    imgPath = storeService.getStoreImg(storeId)
+    imageService.deleteImage(imgPath)
+
+    # 삭제
     result = storeService.deleteStore(storeId)
     return {"result" : result}
 ########################## product #################################################
