@@ -11,6 +11,13 @@ import json
 from datetime import datetime, timedelta # Time generator
 from flask import jsonify # Return json form to client
 import bcrypt
+import base64
+import hashlib
+import hmac
+import src.security.keys as keys
+import time
+import requests
+import random
 
 class AuthService:
     authRepository = auth_repository.AuthRepository()
@@ -52,6 +59,46 @@ class AuthService:
         except ExpiredSignatureError as e:
             print(e)
             return False
+
+    def make_signature(self, string):
+        secret_key = bytes(keys.secret_key, 'UTF-8')
+        string = bytes(string, 'UTF-8')
+        string_hmac = hmac.new(secret_key, string, digestmod=hashlib.sha256).digest()
+        string_base64 = base64.b64encode(string_hmac).decode('UTF-8')
+        return string_base64
+
+    def send_massage(self, phoneNumber):
+        url = "https://sens.apigw.ntruss.com"
+        uri = "/sms/v2/services/" + keys.service_id + "/messages"
+        api_url = url + uri
+        timestamp = str(int(time.time() * 1000))
+        access_key = keys.access_key
+        string_to_sign = "POST " + uri + "\n" + timestamp + "\n" + access_key
+        signature = self.make_signature(string_to_sign)
+
+        headers = {
+            'Content-Type': "application/json; charset=UTF-8",
+            'x-ncp-apigw-timestamp': timestamp,
+            'x-ncp-iam-access-key': access_key,
+            'x-ncp-apigw-signature-v2': signature
+        }
+
+        verificationNum = random.randrange(100000,999999)
+        message = "가는날이 장날이다 인증번호 [" + str(verificationNum) + "] 를 입력해주세요"
+
+        body = {
+            "type": "SMS",
+            "contentType": "COMM",
+            "from": "01041669516",
+            "content": message,
+            "messages": [{"to": phoneNumber}]
+        }
+
+        body = json.dumps(body)
+
+        response = requests.post(api_url, headers=headers, data=body)
+        response.raise_for_status()
+        return {"result": str(verificationNum)}
 
     #--------- /auth/member/customer --------------------------------------
     def addCUser(self, user_id, user_pw): # 회원 가입

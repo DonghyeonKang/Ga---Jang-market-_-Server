@@ -101,23 +101,13 @@ def logoutCustomer():
     result = authService.CLogout(user_id)
     return result
 
-# 상품 좋아요 리스트
-@app.route('/favorites', methods=['GET'])
-@token_required
-def getFavorites():
-    return "1"
-
-# 상품 좋아요
-@app.route('/favorites', methods=['POST'])
-@token_required
-def addFavorites():
-    return "1"
-
-# 상품 좋아요 취소
-@app.route('/favorites', methods=['DELETE'])
-@token_required
-def deleteFavorites():
-    return "1"
+# 휴대폰 인증
+@app.route('/verification', methods=['GET'])
+def getVerificationNumber():
+    authService = auth_service.AuthService()
+    phoneNumber = request.args.get('number')
+    result = authService.send_massage(phoneNumber)
+    return result
 #---------------- merchant -----------------------
 # 회원가입
 @app.route('/member/merchant', methods=['POST'])
