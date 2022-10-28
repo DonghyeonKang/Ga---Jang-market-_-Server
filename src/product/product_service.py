@@ -8,10 +8,8 @@ class ProductService:
     
     def getProduct(self, storeName):
         result = self.productRepository.getProductData(storeName)
-        print(result)
         for i in result:
             productImg = self.productRepository.getStoreImage(i['s_id'])
-            print(productImg)
             # 아직 이미지 1개만 전송해줌
             i['img_path'] = productImg[0]['img_path']
         return result

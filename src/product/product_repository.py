@@ -24,6 +24,21 @@ class ProductRepository:
             arr = [storeName]
             cursor.execute("SELECT * FROM product WHERE s_id=(SELECT id FROM store WHERE store_name=%s)", arr)
             rows = cursor.fetchall()
+
+            for i in rows:
+                arr = i['id']
+                cursor.execute("SELECT selling_option, price FROM product_selling_option WHERE p_id=%s", arr)
+                rows2 = cursor.fetchall()
+                if len(rows2) == 0:
+                    i['selling_option'] = None
+                else:
+                    for j in rows2:
+                        j['label'] = j['selling_option']
+                        del j['selling_option']
+                    i['selling_option'] = rows2
+                    
+                print(rows)
+            
             if len(rows) == 0:
                 return "DB Select Error"
             else:
@@ -38,7 +53,6 @@ class ProductRepository:
     def addProduct(self, productArr, sellingOptionArr, imgArr):
         self.getConnection()
         try:
-            
             cursor = self.connection.cursor()
             cursor.execute("INSERT INTO product(s_id, product_name) VALUES(%s, %s)", productArr)
             self.connection.commit()
@@ -48,7 +62,7 @@ class ProductRepository:
             
             # selling option 등록
             for i in sellingOptionArr:
-                arr = [product_id[0]['id'], i['label'], i['price']]
+                arr = [product_id[0]['id'], i['price'], i['label']]
 
                 cursor.execute("INSERT INTO product_selling_option(p_id, price, selling_option) VALUES(%s, %s, %s)", arr)
                 self.connection.commit()
@@ -98,7 +112,6 @@ class ProductRepository:
             # 이미지 등록
             for i in imgArr:
                 arr = [i, product_id, store_id]
-                print(arr)
                 cursor.execute("UPDATE product_img SET img_path=%s WHERE p_id=%s AND s_id=%s", arr)
                 self.connection.commit()
                 
@@ -114,7 +127,6 @@ class ProductRepository:
         self.getConnection()
         try:
             cursor = self.connection.cursor()
-            print(productArr)
             cursor.execute("UPDATE product SET product_name=%s WHERE id=%s", productArr)
             self.connection.commit()
                         
