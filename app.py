@@ -169,12 +169,20 @@ import src.store.store_service as store_service
 storeService = store_service.StoreService()
 import src.images.imageService as image_service
 imageService = image_service.ImageService()
-
+import base64
 # 매장 리스트
 @app.route('/store', methods=['GET'])
 def getStore():
     marketName = request.args.get('market_name')
     result = storeService.getStore(marketName)
+    for i in result:
+        # 이미지가 있으면 이미지를 가져온다
+        print(i)
+        if i['img_path'] != None:
+            print("yea")
+            with open(i['img_path'], 'rb') as img:
+                base64_string = base64.b64encode(img.read())
+                i['image'] = str(base64_string)
     json_string = json.dumps(result, default=str, ensure_ascii=False)
     return json.loads(json_string)
 
