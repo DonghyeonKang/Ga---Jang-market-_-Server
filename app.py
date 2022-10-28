@@ -177,9 +177,7 @@ def getStore():
     result = storeService.getStore(marketName)
     for i in result:
         # 이미지가 있으면 이미지를 가져온다
-        print(i)
         if i['img_path'] != None:
-            print("yea")
             with open(i['img_path'], 'rb') as img:
                 base64_string = base64.b64encode(img.read())
                 i['image'] = str(base64_string)
@@ -236,12 +234,27 @@ productService = product_service.ProductService()
 def getProduct():
     storeName = request.args.get('store_name')
     result = productService.getProduct(storeName)
+    for i in result:
+        # 이미지가 있으면 이미지를 가져온다
+        if i['img_path'] != None:
+            with open(i['img_path'], 'rb') as img:
+                base64_string = base64.b64encode(img.read())
+                i['image'] = str(base64_string)
+            del i['img_path']
     return {"result" : result}
 
 # 상품 등록
 @app.route('/product', methods=['POST'])
 def addProduct():
     inputData = request.get_json()
+
+    # 이미지 저장 및 path
+    strImage = inputData['image']     
+    productName = inputData['product_name']
+    path = imageService.saveImage(strImage, productName, "product")
+    inputData['image'] = path
+
+    # 상품 저장
     result = productService.addProduct(inputData)
     return {"result" : result}
 
@@ -249,6 +262,17 @@ def addProduct():
 @app.route('/product', methods=['PUT'])
 def updateProduct():
     inputData = request.get_json()
+    # 기존 이미지 삭제
+    imgPath = storeService.getStoreImg(inputData['store_id'])
+    imageService.deleteImage(imgPath)
+
+    # 이미지 저장 및 path
+    strImage = inputData['image']     
+    productName = inputData['product_name']
+    path = imageService.saveImage(strImage, productName, "product")
+    inputData['image'] = path
+
+    # 업데이트
     result = productService.updateProduct(inputData)
     return {"result" : result}
 

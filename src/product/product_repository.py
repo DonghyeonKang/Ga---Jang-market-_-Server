@@ -66,6 +66,21 @@ class ProductRepository:
         finally:
             self.closeConnection()
 
+    # 상품 이미지 조회
+    def getStoreImage(self, storeId):
+        self.getConnection()
+        try:
+            cursor = self.connection.cursor()
+            arr = [storeId]
+            cursor.execute("SELECT img_path FROM product_img WHERE s_id=%s", arr)
+            rows = cursor.fetchall()
+            return rows
+        except Exception as e:
+            print(e)
+            return "DB Select Error"
+        finally:
+            self.closeConnection()
+
     # 상품 수정
     def updateProduct(self, store_id, product_id, productArr, sellingOptionArr, imgArr):
         self.getConnection()
