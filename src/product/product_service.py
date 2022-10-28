@@ -11,7 +11,7 @@ class ProductService:
         for i in result:
             productImg = self.productRepository.getStoreImage(i['s_id'])
             # 아직 이미지 1개만 전송해줌
-            i['img_path'] = productImg[0]['img_path']
+            i['img_path'] = productImg
         return result
 
     # 상품 등록
@@ -19,7 +19,7 @@ class ProductService:
         # 상품 등록
         productArr = [inputData['store_id'], inputData['product_name']] # s_id, product_name, img_path
         sellingOptionArr = inputData['selling_option']
-        imgArr = [inputData['image']]
+        imgArr = [inputData['images']]
         result = self.productRepository.addProduct(productArr, sellingOptionArr, imgArr)
         return result
 

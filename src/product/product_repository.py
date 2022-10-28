@@ -36,9 +36,7 @@ class ProductRepository:
                         j['label'] = j['selling_option']
                         del j['selling_option']
                     i['selling_option'] = rows2
-                    
-                print(rows)
-            
+                                
             if len(rows) == 0:
                 return "DB Select Error"
             else:
@@ -69,10 +67,10 @@ class ProductRepository:
 
             # 이미지 등록
             for i in imgArr:
-                arr = [product_id[0]['id'], productArr[0], i] # p_id, s_id, i
-                cursor.execute("INSERT INTO product_img(p_id, s_id, img_path) VALUES(%s, %s, %s)", arr)
-                self.connection.commit()
-                
+                for j in i:
+                    arr = [product_id[0]['id'], productArr[0], j['image']] # p_id, s_id, i
+                    cursor.execute("INSERT INTO product_img(p_id, s_id, img_path) VALUES(%s, %s, %s)", arr)
+                    self.connection.commit()
             return "success"
         except Exception as e:
             print(e)
