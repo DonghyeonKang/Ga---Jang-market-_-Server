@@ -41,6 +41,7 @@ class StoreRepository:
             arr = [storeId]
             cursor.execute("SELECT img_path FROM store_img WHERE s_id=%s", arr)
             rows = cursor.fetchall()
+            print(rows)
             return rows
         except Exception as e:
             print(e)

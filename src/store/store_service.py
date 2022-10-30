@@ -11,7 +11,6 @@ class StoreService:
         result = self.storeRepository.getStoreData(marketName)
         for i in result:
             storeImg = self.storeRepository.getStoreImage(i['id'])
-            # 아직 이미지 1개만 전송해줌
             i['img_path'] = storeImg[0]['img_path']
         return result
 

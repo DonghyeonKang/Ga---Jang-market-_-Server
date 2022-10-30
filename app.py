@@ -170,7 +170,8 @@ def getStore():
         if i['img_path'] != None:
             with open(i['img_path'], 'rb') as img:
                 base64_string = base64.b64encode(img.read())
-                i['image'] = str(base64_string)
+                imgString = str(base64_string)
+                i['image'] = imgString[2:len(imgString) - 1]
     json_string = json.dumps(result, default=str, ensure_ascii=False)
     return json.loads(json_string)
 
@@ -178,11 +179,13 @@ def getStore():
 @app.route('/store', methods=['POST'])
 def addStore():
     inputData = request.get_json()
+
     # 이미지 저장 및 path
-    strImage = inputData['image']     
-    storeName = inputData['store_name']
-    path = imageService.saveImage(strImage, storeName, "store")
-    inputData['image'] = path
+    for i in inputData['images']:
+        strImage = i['image']
+        storeName = inputData['store_name']
+        path = imageService.saveImage(strImage, storeName, "store")
+        i['image'] = path
 
     result = storeService.addStore(inputData)
     return {"result" : result}
@@ -232,7 +235,8 @@ def getProduct():
             if j['img_path'] != None:
                 with open(j['img_path'], 'rb') as img:
                     base64_string = base64.b64encode(img.read())
-                    j['image'] = str(base64_string)
+                    imgString = str(base64_string)
+                    j['image'] = imgString[2:len(imgString) - 1]
                 del j['img_path']
     return {"result" : result}
 
@@ -261,10 +265,11 @@ def updateProduct():
     imageService.deleteImage(imgPath)
 
     # 이미지 저장 및 path
-    strImage = inputData['image']     
-    productName = inputData['product_name']
-    path = imageService.saveImage(strImage, productName, "product")
-    inputData['image'] = path
+    for i in inputData['images']:
+        strImage = i['image']
+        productName = inputData['product_name']
+        path = imageService.saveImage(strImage, productName, "product")
+        i['image'] = path
 
     # 업데이트
     result = productService.updateProduct(inputData)
@@ -286,7 +291,8 @@ reservationService = reservation_service.ReservationService()
 def getReservation():
     user_id = request.args.get('user_id')
     result = reservationService.getReservation(user_id)
-    return {"result" : result}
+    json_string = json.dumps(result, default=str, ensure_ascii=False)
+    return json.loads(json_string)
 
 # 예약하기
 @app.route('/reservation', methods=['POST'])

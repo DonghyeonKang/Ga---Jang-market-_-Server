@@ -17,17 +17,14 @@ class ReservationRepository:
         self.connection.close()
 
     # 예약 리스트
-    def getReservation(self):
+    def getReservation(self, user_id):
         self.getConnection()
         try:
             cursor = self.connection.cursor()
-            arr = []
-            cursor.execute("SELECT * FROM product WHERE s_id=(SELECT id FROM store WHERE store_name=%s)", arr)
+            arr = [user_id]
+            cursor.execute("SELECT * FROM reservation WHERE uc_id=%s", arr)
             rows = cursor.fetchall()
-            if len(rows) == 0:
-                return "DB Select Error"
-            else:
-                return rows
+            return rows
         except Exception as e:
             print(e)
             return "DB Select Error"
@@ -39,15 +36,28 @@ class ReservationRepository:
         self.getConnection()
         try:
             cursor = self.connection.cursor()
+            arr = [dataArr[0]]
+            cursor.execute("SELECT id FROM users_customer WHERE user_id=%s", arr)
+            rows = cursor.fetchall()
+            print(rows)
+            dataArr[0] = rows[0]['id']
+
+            arr = [dataArr[1]]
+            cursor.execute("SELECT id FROM users_merchant WHERE user_id=%s", arr)
+            rows = cursor.fetchall()
+            print(rows)
+            dataArr[1] = rows[0]['id']
+
             cursor.execute("INSERT INTO reservation(uc_id, um_id, p_id, s_id, reservation_time, price, count, approval) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)", dataArr)
             self.connection.commit()
             arr = dataArr[:4]
             cursor.execute("SELECT id FROM reservation WHERE uc_id=%s AND um_id=%s AND p_id=%s AND s_id=%s", arr)
             rows = cursor.fetchall()
-            return rows[0]
+            print(rows)
+            return rows
         except Exception as e:
             print(e)
-            return "DB Select Error"
+            return "DB Insert Error"
         finally:
             self.closeConnection()
 
@@ -58,12 +68,14 @@ class ReservationRepository:
             cursor = self.connection.cursor()
             arr = [reservation_id]
             cursor.execute("DELETE FROM reservation WHERE id=%s", arr)
+            self.connection.commit()
             return "success"
         except Exception as e:
             print(e)
             return "DB delete Error"
         finally:
             self.closeConnection()
+
     # 수락하기
     def acceptReservation(self, reservation_id):
         self.getConnection()
@@ -71,11 +83,8 @@ class ReservationRepository:
             cursor = self.connection.cursor()
             arr = [reservation_id]
             cursor.execute("UPDATE reservation SET approval=1 WHERE id=%s", arr)
-            rows = cursor.fetchall()
-            if len(rows) == 0:
-                return "DB Select Error"
-            else:
-                return rows
+            self.connection.commit()
+            return "success"
         except Exception as e:
             print(e)
             return "DB Select Error"
@@ -89,11 +98,8 @@ class ReservationRepository:
             cursor = self.connection.cursor()
             arr = [reservation_id]
             cursor.execute("UPDATE reservation SET approval=0 WHERE id=%s", arr)
-            rows = cursor.fetchall()
-            if len(rows) == 0:
-                return "DB Select Error"
-            else:
-                return rows
+            self.connection.commit()
+            return "success"
         except Exception as e:
             print(e)
             return "DB Select Error"

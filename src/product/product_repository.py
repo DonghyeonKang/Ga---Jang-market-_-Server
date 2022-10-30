@@ -24,8 +24,13 @@ class ProductRepository:
             arr = [storeName]
             cursor.execute("SELECT * FROM product WHERE s_id=(SELECT id FROM store WHERE store_name=%s)", arr)
             rows = cursor.fetchall()
-
+            print(rows)
+            print(rows)
+            print(rows)
             for i in rows:
+                print(i)
+                print(i)
+                print(i)
                 arr = i['id']
                 cursor.execute("SELECT selling_option, price FROM product_selling_option WHERE p_id=%s", arr)
                 rows2 = cursor.fetchall()
@@ -37,10 +42,7 @@ class ProductRepository:
                         del j['selling_option']
                     i['selling_option'] = rows2
                                 
-            if len(rows) == 0:
-                return "DB Select Error"
-            else:
-                return rows
+            return rows
         except Exception as e:
             print(e)
             return "DB Select Error"
@@ -84,6 +86,9 @@ class ProductRepository:
         try:
             cursor = self.connection.cursor()
             arr = [storeId]
+            print(storeId)
+            print(storeId)
+            print(storeId)
             cursor.execute("SELECT img_path FROM product_img WHERE s_id=%s", arr)
             rows = cursor.fetchall()
             return rows
@@ -109,9 +114,17 @@ class ProductRepository:
 
             # 이미지 등록
             for i in imgArr:
-                arr = [i, product_id, store_id]
-                cursor.execute("UPDATE product_img SET img_path=%s WHERE p_id=%s AND s_id=%s", arr)
-                self.connection.commit()
+                for j in i:
+                    arr = [product_id[0]['id'], productArr[0], j['image']] # p_id, s_id, i
+                    cursor.execute("INSERT INTO product_img(p_id, s_id, img_path) VALUES(%s, %s, %s)", arr)
+                    self.connection.commit()
+
+            # 이미지 등록
+            for i in imgArr:
+                for j in i:
+                    arr = [j['image'], product_id, store_id]
+                    cursor.execute("UPDATE product_img SET img_path=%s WHERE p_id=%s AND s_id=%s", arr)
+                    self.connection.commit()
                 
             return "success"
         except Exception as e:

@@ -8,11 +8,11 @@ class ReservationService:
 
     # 예약 리스트
     def getReservation(self, user_id):
-        result = self.reservationRepository.getReservationData(user_id)
+        result = self.reservationRepository.getReservation(user_id)
         return result
 
     # 예약하기
-    def addReservation(self, inputData):
+    def addReservation(self, inputData, ):
         dataArr = [inputData['user_id'], inputData['merchant_id'], inputData['product_id'], inputData['store_id'],
                  inputData['reservation_time'], inputData['price'], inputData['count'], 0] # user_id, merchant_id, product_id, store_id, reservation_time, price, count, approval순으로
         result = self.reservationRepository.addReservation(dataArr)
