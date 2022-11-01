@@ -9,6 +9,7 @@ class StoreService:
     # 매장 조회
     def getStore(self, marketName):
         result = self.storeRepository.getStoreData(marketName)
+
         for i in result:
             storeImg = self.storeRepository.getStoreImage(i['id'])
             i['img_path'] = storeImg[0]['img_path']
@@ -21,8 +22,8 @@ class StoreService:
 
     # 매장 등록
     def addStore(self, data):
-        imgArr = [data['image']]
-        print(imgArr)
+        print(data)
+        imgArr = [data['images'][0]['image']]
         result = self.storeRepository.addStore(data, imgArr)
         return result
 

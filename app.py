@@ -280,6 +280,11 @@ def updateProduct():
 def deleteProduct():
     productId = request.args.get('product_id')
     storeId = request.args.get('store_id')
+
+    # 이미지 삭제
+    imgPath = productService.getProductImg(productId)
+    imageService.deleteImage(imgPath)
+
     result = productService.deleteProduct(productId, storeId)
     return {"result" : result}
 

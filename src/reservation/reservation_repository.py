@@ -24,6 +24,7 @@ class ReservationRepository:
             arr = [user_id]
             cursor.execute("SELECT * FROM reservation WHERE uc_id=%s", arr)
             rows = cursor.fetchall()
+
             return rows
         except Exception as e:
             print(e)
