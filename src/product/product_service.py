@@ -8,9 +8,10 @@ class ProductService:
     
     def getProduct(self, storeName):
         result = self.productRepository.getProductData(storeName)
+
         for i in result:
             productImg = self.productRepository.getProductImage(i['id'])
-            i['img_path'] = productImg
+            i['img_paths'] = productImg
         return result
 
     # 상품 등록

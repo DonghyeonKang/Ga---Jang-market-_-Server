@@ -6,13 +6,36 @@ class StoreService:
     def __init__(self) -> None:
         pass
 
-    # 매장 조회
+    # 시장의 모든 매장 조회
     def getStore(self, marketName):
         result = self.storeRepository.getStoreData(marketName)
 
         for i in result:
             storeImg = self.storeRepository.getStoreImage(i['id'])
-            i['img_path'] = storeImg[0]['img_path']
+
+            # result 에 'img_paths' 추가
+            i['img_paths'] = []
+            if len(storeImg) > 0:
+                for j in storeImg:
+                    i['img_paths'].append(j['img_path'])
+            else:
+                i['img_paths'] = None
+        return result
+
+    # 내 매장 조회
+    def getMyStore(self, merchantId):
+        result = self.storeRepository.getMyStoreData(merchantId)
+
+        for i in result:
+            storeImg = self.storeRepository.getStoreImage(i['id'])
+
+            # result 에 'img_paths' 추가
+            i['img_paths'] = []
+            if len(storeImg) > 0:
+                for j in storeImg:
+                    i['img_paths'].append(j['img_path'])
+            else:
+                i['img_paths'] = None
         return result
 
     # 매장 이미지 조회
@@ -22,14 +45,13 @@ class StoreService:
 
     # 매장 등록
     def addStore(self, data):
-        print(data)
-        imgArr = [data['images'][0]['image']]
+        imgArr = data['images']
         result = self.storeRepository.addStore(data, imgArr)
         return result
 
     # 매장 수정
     def updateStore(self, data):
-        imgArr = [data['image']]
+        imgArr = data['images']
         result = self.storeRepository.updateStore(data, imgArr)
         return result
 

@@ -152,7 +152,10 @@ def getMarket():
     marketService = market_service.MarketService()
     marketName = request.args.get('market_name')
     result = marketService.getMarket(marketName)
-    return {"result" : result}
+    if len(result) > 0:
+        return {"result" : result}
+    else:
+        return {"result" : None}
 
 ########################## store #################################################
 import src.store.store_service as store_service
@@ -160,20 +163,63 @@ storeService = store_service.StoreService()
 import src.images.imageService as image_service
 imageService = image_service.ImageService()
 import base64
-# 매장 리스트
+
+# 매장 리스트 조회
 @app.route('/store', methods=['GET'])
 def getStore():
     marketName = request.args.get('market_name')
     result = storeService.getStore(marketName)
-    for i in result:
-        # 이미지가 있으면 이미지를 가져온다
-        if i['img_path'] != None:
-            with open(i['img_path'], 'rb') as img:
-                base64_string = base64.b64encode(img.read())
-                imgString = str(base64_string)
-                i['image'] = imgString[2:len(imgString) - 1]
-    json_string = json.dumps(result, default=str, ensure_ascii=False)
-    return json.loads(json_string)
+
+    if len(result) > 0:
+        for i in result:
+            try:
+                i['images'] = []
+
+                # 이미지가 있으면 이미지를 가져온다 없으면 None
+                if i['img_paths'] != None:
+                    for j in i['img_paths']:
+                        with open(j, 'rb') as img:
+                            base64_string = base64.b64encode(img.read())
+                            imgString = str(base64_string)
+                            i['images'].append(imgString[2:len(imgString) - 1])
+                else:
+                    i['images'] = None
+                del i['img_paths']
+            except FileNotFoundError:
+                del i['img_paths']
+                pass
+            json_string = json.dumps(result, default=str, ensure_ascii=False)
+        return json.loads(json_string)
+    else:
+        return {"result": None}
+
+# 내 매장 조회
+@app.route('/store/my', methods=['GET'])
+def getMyStore():
+    merchantId = request.args.get('merchant_id')
+    result = storeService.getMyStore(merchantId)
+    if len(result) > 0:
+        for i in result:
+            try:
+                i['images'] = []
+
+                # 이미지가 있으면 이미지를 가져온다
+                if len(i['img_paths']) > 0:                
+                    for j in i['img_paths']:
+                        with open(j, 'rb') as img:
+                            base64_string = base64.b64encode(img.read())
+                            imgString = str(base64_string)
+                            i['images'].append(imgString[2:len(imgString) - 1])
+                else:
+                    i['images'] = None
+                del i['img_paths']
+            except FileNotFoundError:
+                del i['img_paths']
+                pass
+            json_string = json.dumps(result, default=str, ensure_ascii=False)
+        return json.loads(json_string)
+    else:
+        return {"result": None}
 
 # 매장 등록
 @app.route('/store', methods=['POST'])
@@ -199,10 +245,11 @@ def updateStore():
     imageService.deleteImage(imgPath)
 
     # 이미지 저장 및 path
-    strImage = inputData['image']     
-    storeName = inputData['store_name']
-    path = imageService.saveImage(strImage, storeName, "store")
-    inputData['image'] = path
+    for i in inputData['images']:
+        strImage = i['image']
+        storeName = inputData['store_name']
+        path = imageService.saveImage(strImage, storeName, "store")
+        i['image'] = path
 
     result = storeService.updateStore(inputData)
     return {"result" : result}
@@ -227,18 +274,23 @@ productService = product_service.ProductService()
 def getProduct():
     storeName = request.args.get('store_name')
     result = productService.getProduct(storeName)
-    for i in result:
-        # 이미지가 있으면 이미지를 가져온다
-        i['images'] = i['img_path']
-        del i['img_path']
-        for j in i['images']:
-            if j['img_path'] != None:
-                with open(j['img_path'], 'rb') as img:
-                    base64_string = base64.b64encode(img.read())
-                    imgString = str(base64_string)
-                    j['image'] = imgString[2:len(imgString) - 1]
-                del j['img_path']
-    return {"result" : result}
+    if len(result) > 0:
+        for i in result:
+            # 이미지가 있으면 이미지를 가져온다
+            i['images'] = []
+
+            if len(i['img_paths']) > 0:
+                for j in i['img_paths']:
+                    with open(j['img_path'], 'rb') as img:
+                        base64_string = base64.b64encode(img.read())
+                        imgString = str(base64_string)
+                        i['images'].append(imgString[2:len(imgString) - 1])
+            else:
+                i['images'] = None
+            del i['img_paths']
+        return {"result" : result}
+    else:
+        return {"result" : None}
 
 # 상품 등록
 @app.route('/product', methods=['POST'])
@@ -294,10 +346,14 @@ reservationService = reservation_service.ReservationService()
 # 예약 리스트
 @app.route('/reservation', methods=['GET'])
 def getReservation():
-    user_id = request.args.get('user_id')
-    result = reservationService.getReservation(user_id)
-    json_string = json.dumps(result, default=str, ensure_ascii=False)
-    return json.loads(json_string)
+    customerId = request.args.get('customer_id')
+    result = reservationService.getReservation(customerId)
+
+    if len(result) > 0:
+        json_string = json.dumps(result, default=str, ensure_ascii=False)
+        return json.loads(json_string)
+    else:
+        return {"result": None}
 
 # 예약하기
 @app.route('/reservation', methods=['POST'])
@@ -305,7 +361,7 @@ def addReservation():
     # notification 으로 상인에게 알림을 넘겨줘야함
     inputData = request.get_json()
     result = reservationService.addReservation(inputData)
-    return {"reservation_id" : result}
+    return {"result" : result}
 
 # 취소하기
 @app.route('/reservation', methods=['DELETE'])
@@ -337,7 +393,10 @@ searchService = search_service.SearchService()
 def search():
     word = request.args.get('word')
     result = searchService.getSearchData(word)
-    return {"result" : result}
+    if len(result) > 0:
+        return {"result" : result}
+    else:
+        return {"result" : None}
 
 
 if __name__ == '__main__':

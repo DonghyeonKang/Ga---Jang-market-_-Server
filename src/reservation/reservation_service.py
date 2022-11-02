@@ -7,8 +7,8 @@ class ReservationService:
         pass
 
     # 예약 리스트
-    def getReservation(self, user_id):
-        result = self.reservationRepository.getReservation(user_id)
+    def getReservation(self, customerId):
+        result = self.reservationRepository.getReservation(customerId)
         return result
 
     # 예약하기

@@ -17,12 +17,12 @@ class ReservationRepository:
         self.connection.close()
 
     # 예약 리스트
-    def getReservation(self, user_id):
+    def getReservation(self, customerId):
         self.getConnection()
         try:
             cursor = self.connection.cursor()
-            arr = [user_id]
-            cursor.execute("SELECT * FROM reservation WHERE uc_id=%s", arr)
+            arr = [customerId]
+            cursor.execute("SELECT * FROM reservation WHERE uc_id=(SELECT id FROM users_customer WHERE user_id=%s)", arr)
             rows = cursor.fetchall()
 
             return rows
@@ -51,11 +51,7 @@ class ReservationRepository:
 
             cursor.execute("INSERT INTO reservation(uc_id, um_id, p_id, s_id, reservation_time, price, count, approval) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)", dataArr)
             self.connection.commit()
-            arr = dataArr[:4]
-            cursor.execute("SELECT id FROM reservation WHERE uc_id=%s AND um_id=%s AND p_id=%s AND s_id=%s", arr)
-            rows = cursor.fetchall()
-            print(rows)
-            return rows
+            return "success"
         except Exception as e:
             print(e)
             return "DB Insert Error"
